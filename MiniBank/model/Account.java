@@ -1,12 +1,17 @@
 package model;
 
+import model.annotation.Id;
+import model.annotation.Positive;
+
 public abstract class Account implements Transactable, InterestBearing,
     Cloneable {
 
 	private static long accountCounter = 0;
 
+	@Id
 	private final String accountNumber;
 	private String ownerName;
+	@Positive
 	private long balance;
 	private boolean active;
 
@@ -26,14 +31,17 @@ public abstract class Account implements Transactable, InterestBearing,
 		return String.format("AC%04d", accountCounter);
 	}
 
+	@Override
 	public abstract double interestRate();
 
 	public abstract boolean canWithdraw(long amount);
 
+	@Override
 	public void deposit(long amount) {
 		balance += amount;
 	}
 
+	@Override
 	public boolean withdraw(long amount) {
 		if (!canWithdraw(amount)) {
 			return false;
@@ -43,6 +51,7 @@ public abstract class Account implements Transactable, InterestBearing,
 		return true;
 	}
 
+	@Override
 	public Account clone() {
 		try {
 			return (Account) super.clone();
@@ -59,6 +68,7 @@ public abstract class Account implements Transactable, InterestBearing,
 		return ownerName;
 	}
 
+	@Override
 	public long getBalance() {
 		return balance;
 	}
@@ -67,10 +77,12 @@ public abstract class Account implements Transactable, InterestBearing,
 		return active;
 	}
 
+	@Override
 	public String toString() {
 		return accountNumber + " | " + ownerName + " | " + balance;
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -84,6 +96,7 @@ public abstract class Account implements Transactable, InterestBearing,
 		return accountNumber.equals(other.accountNumber);
 	}
 
+	@Override
 	public int hashCode() {
 		return accountNumber.hashCode();
 	}

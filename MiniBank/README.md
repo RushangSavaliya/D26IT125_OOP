@@ -1,13 +1,14 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 6** stage: interfaces, packages and a runnable
-JAR. The Practical 1 menu shell is unchanged and every menu option is
-still a placeholder for a later lab.
+This is the **Practical 7** stage: custom annotations (`@Id`,
+`@Positive`, `@MaxLength`) read at run time by a reflective validator.
+The Practical 1 menu shell is unchanged and every menu option is still a
+placeholder for a later lab.
 
 On start-up the program runs a short demo (model behaviour, interface
-implementations, validators, command parsing and a formatted statement)
-and then shows the menu.
+implementations, annotation validation, validators, command parsing and a
+formatted statement) and then shows the menu.
 
 ## Requirements
 
@@ -39,7 +40,8 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 | Package | Files |
 | --- | --- |
 | `model` | `BankInfo`, `MenuOption`, `Customer`, `Account`, `SavingsAccount`, `CurrentAccount`, `FixedDepositAccount`, `TransactionType`, `Command`, `Transactable`, `InterestBearing`, `WithdrawRule`, `Premium` |
-| `util` | `Validator`, `CommandParser`, `StatementFormatter` |
+| `model.annotation` | `Id`, `Positive`, `MaxLength` (all `@Target(FIELD)`, `@Retention(RUNTIME)`) |
+| `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter` |
 | `service` | `MiniBank` (`main`) |
 
 ## Key types
@@ -50,6 +52,10 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 - `WithdrawRule` — functional interface `allow(Account, long)`, used once
   as an anonymous class and once as a lambda in `MiniBank`.
 - `Premium` — marker interface, implemented by `CurrentAccount`.
+- `@Id` — marks `Account.accountNumber` and `Customer.customerId` for the
+  repository in Practical 13.
+- `AnnotationValidator` — reads `@Positive` and `@MaxLength` by reflection
+  (walking the superclass chain) and returns the error messages.
 
 ## Menu
 

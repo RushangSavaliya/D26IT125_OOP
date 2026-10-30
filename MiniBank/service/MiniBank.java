@@ -12,6 +12,7 @@ import model.MenuOption;
 import model.Premium;
 import model.SavingsAccount;
 import model.WithdrawRule;
+import util.AnnotationValidator;
 import util.CommandParser;
 import util.StatementFormatter;
 
@@ -28,6 +29,7 @@ public class MiniBank {
 		printHeader();
 		Account[] accounts = demonstrateAccounts();
 		demonstrateInterfaces(accounts);
+		demonstrateAnnotations(accounts);
 		demonstrateValidationLayer(accounts[0]);
 
 		try (Scanner sc = new Scanner(System.in)) {
@@ -205,6 +207,37 @@ public class MiniBank {
 				System.out.println(
 				    account.getAccountNumber() + " is premium");
 			}
+		}
+		System.out.println();
+	}
+
+	private static void demonstrateAnnotations(Account[] accounts) {
+		System.out.println("-- Annotation validation --");
+
+		System.out.println("Valid account errors: " +
+		    AnnotationValidator.validate(accounts[0]).length);
+
+		Account invalid = new SavingsAccount("Neel", -100, 500);
+		String[] accountErrors = AnnotationValidator.validate(invalid);
+		System.out.println("Invalid account " +
+		    invalid.getAccountNumber() + " errors: " +
+		    accountErrors.length);
+
+		for (String error : accountErrors) {
+			System.out.println("  " + error);
+		}
+
+		Customer longName = new Customer(
+		    "Riya Sharma of Rajkot Branch",
+		    "riya@example.com", "9876543210");
+		String[] customerErrors =
+		    AnnotationValidator.validate(longName);
+
+		System.out.println("Long customer name errors: " +
+		    customerErrors.length);
+
+		for (String error : customerErrors) {
+			System.out.println("  " + error);
 		}
 		System.out.println();
 	}

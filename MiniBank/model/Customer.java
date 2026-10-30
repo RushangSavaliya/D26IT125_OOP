@@ -1,10 +1,15 @@
 package model;
 
+import model.annotation.Id;
+import model.annotation.MaxLength;
+
 public class Customer implements Cloneable {
 
 	private static long customerCounter = 100;
 
+	@Id
 	private final String customerId;
+	@MaxLength(20)
 	private String name;
 	private String email;
 	private String mobile;
@@ -28,6 +33,7 @@ public class Customer implements Cloneable {
 		return "CUST" + customerCounter;
 	}
 
+	@Override
 	public Customer clone() {
 		Customer copy;
 
