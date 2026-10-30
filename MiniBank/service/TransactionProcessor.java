@@ -1,19 +1,49 @@
 package service;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import model.Account;
+import model.TransactionType;
+
 public class TransactionProcessor {
 
 	private final ExecutorService pool;
+	private final ConcurrentHashMap<String, Account> accounts =
+	    new ConcurrentHashMap<>();
 
 	public TransactionProcessor() {
 		pool = Executors.newFixedThreadPool(4);
 	}
 
+	public void register(Account account) {
+		accounts.put(account.getAccountNumber(), account);
+	}
+
+	public Account find(String accountNumber) {
+		return accounts.get(accountNumber);
+	}
+
 	public void submit(Runnable task) {
 		pool.execute(task);
+	}
+
+	public void submit(String accountNumber, TransactionType type,
+	    long amount) {
+		pool.execute(() -> {
+			Account account = accounts.get(accountNumber);
+
+			if (account == null) {
+				System.out.println(
+				    Thread.currentThread().getName() +
+				    " account not found: " + accountNumber);
+				return;
+			}
+
+			new TransactionTask(account, type, amount).run();
+		});
 	}
 
 	public void stop() {

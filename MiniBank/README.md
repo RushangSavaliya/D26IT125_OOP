@@ -1,14 +1,14 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 11** stage: accounts can be saved and reloaded
-with object serialization, transactions are appended to `.log` files,
-and an NIO report summarises the logs. The Practical 1 menu shell is
-unchanged.
+This is the **Practical 12** stage (Milestone 2): accounts are stored in a
+`HashMap` keyed by account number, sorted with a `Comparator`, and the
+transaction processor shares accounts through a `ConcurrentHashMap`. The
+Practical 1 menu shell is unchanged.
 
 On start-up the program runs a short demo (model, interfaces, validation,
-annotations, exceptions, threads, concurrency, persistence and reporting)
-and then shows the menu.
+annotations, exceptions, threads, concurrency, persistence, reporting and
+collections) and then shows the menu.
 
 ## Requirements
 
@@ -43,7 +43,7 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 | `model.annotation` | `Id`, `Positive`, `MaxLength` (all `@Target(FIELD)`, `@Retention(RUNTIME)`) |
 | `exception` | `BankException` (checked base), `InsufficientFundsException`, `AccountNotFoundException`, `InvalidAmountException` |
 | `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter`, `AuditTrail`, `StatePersister`, `TransactionLog`, `ReportGenerator` |
-| `service` | `MiniBank` (`main`), `AccountWorker`, `TransactionProcessor`, `TransactionTask`, `TransactionBuffer`, `ConcurrencyDemo` |
+| `service` | `MiniBank` (`main`), `AccountWorker`, `TransactionProcessor`, `TransactionTask`, `TransactionBuffer`, `ConcurrencyDemo`, `AccountStore` |
 
 ## Key types
 
@@ -76,6 +76,12 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 - `ReportGenerator` — walks `data/logs/*.log` with `Files.newDirectoryStream`,
   sums deposits/withdrawals, reads size and last-modified attributes, and
   writes `data/report.txt`.
+- `AccountStore` — `HashMap<String, Account>` keyed by account number,
+  `ArrayList<String>` history, and `sortedByBalance()` using a reversed
+  `Comparator.comparingLong`.
+- `Account` implements `Comparable<Account>` (by account number).
+- `TransactionProcessor` keeps its shared accounts in a `ConcurrentHashMap`
+  and can submit tasks by account number.
 
 ## Menu
 

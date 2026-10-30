@@ -27,14 +27,17 @@ public class ConcurrencyDemo {
 
 		Account account = new SavingsAccount("Batch", 1000, 0);
 		TransactionProcessor processor = new TransactionProcessor();
+		processor.register(account);
+
+		String number = account.getAccountNumber();
 
 		for (int i = 0; i < 12; i++) {
 			boolean withdraw = i % 4 == 3;
 
-			processor.submit(new TransactionTask(account,
+			processor.submit(number,
 			    withdraw ? TransactionType.WITHDRAW
 				: TransactionType.DEPOSIT,
-			    withdraw ? 50 : 100));
+			    withdraw ? 50 : 100);
 		}
 
 		processor.stop();

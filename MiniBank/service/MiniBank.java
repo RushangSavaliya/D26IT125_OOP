@@ -3,6 +3,8 @@ package service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import exception.AccountNotFoundException;
@@ -48,6 +50,7 @@ public class MiniBank {
 			demonstrateThreads();
 			ConcurrencyDemo.run();
 			demonstratePersistence(accounts);
+			demonstrateCollections();
 		} catch (BankException e) {
 			System.out.println("Bank error: " + e.getMessage());
 		} finally {
@@ -506,6 +509,48 @@ public class MiniBank {
 		} catch (IOException e) {
 			System.out.println("Persistence error: " +
 			    e.getMessage());
+		}
+		System.out.println();
+	}
+
+	private static void demonstrateCollections() {
+		System.out.println("-- Collections --");
+
+		Account high = new FixedDepositAccount("Nisha", 9000);
+		Account mid = new SavingsAccount("Kiran", 5000, 500);
+		Account low = new CurrentAccount("Dev", 2000, 1000);
+
+		AccountStore store = new AccountStore();
+		store.add(mid);
+		store.add(low);
+		store.add(high);
+
+		System.out.println("Lookup " + mid.getAccountNumber() +
+		    ": " + store.get(mid.getAccountNumber()));
+
+		System.out.println("By balance (descending):");
+		for (Account account : store.sortedByBalance()) {
+			System.out.println("  " + account);
+		}
+
+		ArrayList<Account> byNumber = store.getAll();
+		Collections.sort(byNumber);
+
+		System.out.println("By account number (Comparable):");
+		for (Account account : byNumber) {
+			System.out.println("  " + account.getAccountNumber());
+		}
+
+		store.addHistory("DEPOSIT " + mid.getAccountNumber() +
+		    " 500");
+		store.addHistory("WITHDRAW " + low.getAccountNumber() +
+		    " 200");
+
+		System.out.println("History entries: " +
+		    store.getHistory().size());
+
+		for (String line : store.getHistory()) {
+			System.out.println("  " + line);
 		}
 		System.out.println();
 	}
