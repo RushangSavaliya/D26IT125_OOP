@@ -40,6 +40,7 @@ public class MiniBank {
 			demonstrateValidationLayer(accounts[0]);
 			demonstrateExceptions(accounts);
 			demonstrateThreads();
+			ConcurrencyDemo.run();
 		} catch (BankException e) {
 			System.out.println("Bank error: " + e.getMessage());
 		} finally {

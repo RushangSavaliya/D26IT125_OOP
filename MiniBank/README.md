@@ -1,14 +1,14 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 9** stage: `deposit` and `withdraw` are
-`synchronized`, so many threads can update one account without losing
-updates. The demo first shows the unsynchronized race, then the correct
-balance. The Practical 1 menu shell is unchanged.
+This is the **Practical 10** stage: a transaction engine with a managed
+thread pool, a `wait`/`notify` producer-consumer buffer, and a deadlock
+demonstrated then fixed with consistent lock ordering. The Practical 1
+menu shell is unchanged.
 
 On start-up the program runs a short demo (model, interfaces, validation,
-annotations, exceptions, threads and statements) and then shows the
-menu.
+annotations, exceptions, threads, concurrency and statements) and then
+shows the menu.
 
 ## Requirements
 
@@ -43,7 +43,7 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 | `model.annotation` | `Id`, `Positive`, `MaxLength` (all `@Target(FIELD)`, `@Retention(RUNTIME)`) |
 | `exception` | `BankException` (checked base), `InsufficientFundsException`, `AccountNotFoundException`, `InvalidAmountException` |
 | `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter`, `AuditTrail` |
-| `service` | `MiniBank` (`main`), `AccountWorker` (Runnable depositing into one account) |
+| `service` | `MiniBank` (`main`), `AccountWorker`, `TransactionProcessor`, `TransactionTask`, `TransactionBuffer`, `ConcurrencyDemo` |
 
 ## Key types
 
@@ -65,6 +65,11 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 - `AccountWorker` — `Runnable` that deposits `times` × `amount`; ten
   threads on one `Account` end at exactly 10000 because `deposit` and
   `withdraw` are `synchronized`.
+- `TransactionProcessor` — fixed pool of 4 threads; `submit` runs tasks,
+  `stop` shuts down and awaits termination.
+- `TransactionBuffer` — bounded array buffer using `wait`/`notifyAll`.
+- `ConcurrencyDemo` — pool batch, producer/consumer, and a deadlock
+  (detected with `ThreadMXBean`) followed by the ordered-lock fix.
 
 ## Menu
 
