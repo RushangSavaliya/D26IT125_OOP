@@ -61,15 +61,21 @@ public class MiniBank {
 	}
 
 	private static void demonstrateAccounts() {
-		System.out.println("-- Customer ids --");
-		Customer first = new Customer(
-		    "Riya", "riya@example.com", "9876543210");
+		System.out.println("-- Customers --");
+		Customer first = new Customer("Riya", "riya@example.com",
+		    "9876543210",
+		    new Customer.Address("12 MG Road", "Rajkot", "360001"));
 		Customer second = new Customer(
 		    "Aarav", "aarav@example.com", "9123456780");
-		System.out.println(
-		    first.getCustomerId() + " | " + first.getName());
+		System.out.println(first.getCustomerId() + " | " +
+		    first.getName() + " | " + first.getAddress().getCity());
 		System.out.println(
 		    second.getCustomerId() + " | " + second.getName());
+
+		Customer copy = first.clone();
+		System.out.println("clone is a new object: " + (copy != first));
+		System.out.println("clone has the same id: " +
+		    copy.getCustomerId().equals(first.getCustomerId()));
 		System.out.println();
 
 		System.out.println("-- Account demo --");
@@ -96,12 +102,27 @@ public class MiniBank {
 		accounts[1].deposit(1500);
 		accounts[2].deposit(500);
 
+		Account a1 = accounts[0];
+		Account a2 = new Account(a1);
+
+		System.out.println("-- Accounts (toString) --");
 		for (Account account : accounts) {
-			System.out.println(account.getAccountNumber() + " | " +
-			    account.getOwnerName() + " | " +
-			    account.getBalance() + " | active=" +
-			    account.isActive());
+			System.out.println(account);
 		}
+		System.out.println("a2 (twin of a1) = " + a2);
+		System.out.println();
+
+		System.out.println("-- equals / hashCode / instanceof --");
+		System.out.println("a1.equals(a2) same number: " +
+		    a1.equals(a2));
+		System.out.println("a1.hashCode() == a2.hashCode(): " +
+		    (a1.hashCode() == a2.hashCode()));
+		System.out.println("a1.equals(accounts[1]): " +
+		    a1.equals(accounts[1]));
+
+		Object candidate = accounts[1];
+		System.out.println("candidate instanceof Account: " +
+		    (candidate instanceof Account));
 		System.out.println();
 	}
 

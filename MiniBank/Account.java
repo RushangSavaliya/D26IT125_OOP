@@ -18,6 +18,15 @@ public class Account {
 		this(ownerName, 0);
 	}
 
+	// Copy constructor: same account number, used to build an equal twin
+	// of an account so the equals() contract can be demonstrated.
+	public Account(Account other) {
+		this.accountNumber = other.accountNumber;
+		this.ownerName = other.ownerName;
+		this.balance = other.balance;
+		this.active = other.active;
+	}
+
 	private static String generateAccountNumber() {
 		accountCounter++;
 		return String.format("AC%04d", accountCounter);
@@ -50,5 +59,26 @@ public class Account {
 
 	public boolean isActive() {
 		return active;
+	}
+
+	public String toString() {
+		return accountNumber + " | " + ownerName + " | " + balance;
+	}
+
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof Account)) {
+			return false;
+		}
+
+		Account other = (Account) o;
+		return accountNumber.equals(other.accountNumber);
+	}
+
+	public int hashCode() {
+		return accountNumber.hashCode();
 	}
 }
