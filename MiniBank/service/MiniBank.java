@@ -1,5 +1,8 @@
 package service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 import exception.AccountNotFoundException;
@@ -19,7 +22,10 @@ import model.WithdrawRule;
 import util.AnnotationValidator;
 import util.AuditTrail;
 import util.CommandParser;
+import util.ReportGenerator;
+import util.StatePersister;
 import util.StatementFormatter;
+import util.TransactionLog;
 
 import static util.Validator.*;
 
@@ -41,6 +47,7 @@ public class MiniBank {
 			demonstrateExceptions(accounts);
 			demonstrateThreads();
 			ConcurrencyDemo.run();
+			demonstratePersistence(accounts);
 		} catch (BankException e) {
 			System.out.println("Bank error: " + e.getMessage());
 		} finally {
@@ -449,6 +456,58 @@ public class MiniBank {
 		long get() {
 			return balance;
 		}
+	}
+
+	private static void demonstratePersistence(Account[] accounts) {
+		System.out.println("-- Persistence --");
+
+		Path dataDir = Path.of("data");
+		Path accountsFile = dataDir.resolve("accounts.dat");
+		Path logsDir = dataDir.resolve("logs");
+		Path reportFile = dataDir.resolve("report.txt");
+
+		try {
+			Files.deleteIfExists(logsDir.resolve("day-01.log"));
+			Files.deleteIfExists(logsDir.resolve("day-02.log"));
+
+			StatePersister.save(accounts, accountsFile);
+			System.out.println("Saved " + accounts.length +
+			    " accounts to " + accountsFile);
+
+			Account[] loaded = StatePersister.load(accountsFile);
+			System.out.println("Loaded " + loaded.length +
+			    " accounts:");
+
+			for (Account account : loaded) {
+				System.out.println("  " +
+				    account.getClass().getSimpleName() + " " +
+				    account);
+			}
+			System.out.println();
+
+			String first = accounts[0].getAccountNumber();
+			String second = accounts[1].getAccountNumber();
+			String third = accounts[2].getAccountNumber();
+
+			TransactionLog.append(logsDir.resolve("day-01.log"),
+			    "DEPOSIT " + first + " 500");
+			TransactionLog.append(logsDir.resolve("day-01.log"),
+			    "WITHDRAW " + second + " 200");
+			TransactionLog.append(logsDir.resolve("day-02.log"),
+			    "DEPOSIT " + third + " 300");
+			TransactionLog.append(logsDir.resolve("day-02.log"),
+			    "WITHDRAW " + first + " 100");
+
+			String report =
+			    ReportGenerator.generate(logsDir, reportFile);
+
+			System.out.println(report);
+			System.out.println("Report written to " + reportFile);
+		} catch (IOException e) {
+			System.out.println("Persistence error: " +
+			    e.getMessage());
+		}
+		System.out.println();
 	}
 
 	private static void printHeader() {

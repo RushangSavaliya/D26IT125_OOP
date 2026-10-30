@@ -1,14 +1,14 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 10** stage: a transaction engine with a managed
-thread pool, a `wait`/`notify` producer-consumer buffer, and a deadlock
-demonstrated then fixed with consistent lock ordering. The Practical 1
-menu shell is unchanged.
+This is the **Practical 11** stage: accounts can be saved and reloaded
+with object serialization, transactions are appended to `.log` files,
+and an NIO report summarises the logs. The Practical 1 menu shell is
+unchanged.
 
 On start-up the program runs a short demo (model, interfaces, validation,
-annotations, exceptions, threads, concurrency and statements) and then
-shows the menu.
+annotations, exceptions, threads, concurrency, persistence and reporting)
+and then shows the menu.
 
 ## Requirements
 
@@ -42,7 +42,7 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 | `model` | `BankInfo`, `MenuOption`, `Customer`, `Account`, `SavingsAccount`, `CurrentAccount`, `FixedDepositAccount`, `TransactionType`, `Command`, `Transactable`, `InterestBearing`, `WithdrawRule`, `Premium` |
 | `model.annotation` | `Id`, `Positive`, `MaxLength` (all `@Target(FIELD)`, `@Retention(RUNTIME)`) |
 | `exception` | `BankException` (checked base), `InsufficientFundsException`, `AccountNotFoundException`, `InvalidAmountException` |
-| `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter`, `AuditTrail` |
+| `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter`, `AuditTrail`, `StatePersister`, `TransactionLog`, `ReportGenerator` |
 | `service` | `MiniBank` (`main`), `AccountWorker`, `TransactionProcessor`, `TransactionTask`, `TransactionBuffer`, `ConcurrencyDemo` |
 
 ## Key types
@@ -70,6 +70,12 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 - `TransactionBuffer` — bounded array buffer using `wait`/`notifyAll`.
 - `ConcurrencyDemo` — pool batch, producer/consumer, and a deadlock
   (detected with `ThreadMXBean`) followed by the ordered-lock fix.
+- `StatePersister` — `ObjectOutputStream`/`ObjectInputStream` save/load of
+  `Account[]`; the model classes are `Serializable`.
+- `TransactionLog` — append-only `.log` writer using `Files.write`.
+- `ReportGenerator` — walks `data/logs/*.log` with `Files.newDirectoryStream`,
+  sums deposits/withdrawals, reads size and last-modified attributes, and
+  writes `data/report.txt`.
 
 ## Menu
 

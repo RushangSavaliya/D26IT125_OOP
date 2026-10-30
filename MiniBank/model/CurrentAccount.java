@@ -1,6 +1,11 @@
 package model;
 
-public class CurrentAccount extends Account implements Premium {
+import java.io.Serializable;
+
+public class CurrentAccount extends Account
+    implements Premium, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private long overdraftLimit;
 
