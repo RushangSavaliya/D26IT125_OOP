@@ -9,6 +9,7 @@ public class MiniBank {
 	public static void main(String[] args) {
 
 		printHeader();
+		demonstrateAccounts();
 
 		try (Scanner sc = new Scanner(System.in)) {
 
@@ -57,6 +58,51 @@ public class MiniBank {
 
 		System.out.println(
 		    "Thank you for banking with MiniBank. Goodbye!");
+	}
+
+	private static void demonstrateAccounts() {
+		System.out.println("-- Customer ids --");
+		Customer first = new Customer(
+		    "Riya", "riya@example.com", "9876543210");
+		Customer second = new Customer(
+		    "Aarav", "aarav@example.com", "9123456780");
+		System.out.println(
+		    first.getCustomerId() + " | " + first.getName());
+		System.out.println(
+		    second.getCustomerId() + " | " + second.getName());
+		System.out.println();
+
+		System.out.println("-- Account demo --");
+		Account[] accounts = {
+			new Account("Riya", 5000),
+			new Account("Aarav"),
+			new Account("Meera", 2500)
+		};
+
+		Account riya = accounts[0];
+
+		riya.deposit(2000);
+		System.out.println(
+		    "Deposit 2000 -> balance " + riya.getBalance());
+
+		boolean paid = riya.withdraw(3000);
+		System.out.println("Withdraw 3000 -> " + paid +
+		    ", balance " + riya.getBalance());
+
+		boolean rejected = riya.withdraw(10000);
+		System.out.println("Withdraw 10000 -> " + rejected +
+		    ", balance " + riya.getBalance());
+
+		accounts[1].deposit(1500);
+		accounts[2].deposit(500);
+
+		for (Account account : accounts) {
+			System.out.println(account.getAccountNumber() + " | " +
+			    account.getOwnerName() + " | " +
+			    account.getBalance() + " | active=" +
+			    account.isActive());
+		}
+		System.out.println();
 	}
 
 	private static void printHeader() {
