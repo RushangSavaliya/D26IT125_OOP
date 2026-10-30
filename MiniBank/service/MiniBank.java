@@ -39,6 +39,7 @@ public class MiniBank {
 			demonstrateAnnotations(accounts);
 			demonstrateValidationLayer(accounts[0]);
 			demonstrateExceptions(accounts);
+			demonstrateThreads();
 		} catch (BankException e) {
 			System.out.println("Bank error: " + e.getMessage());
 		} finally {
@@ -359,6 +360,94 @@ public class MiniBank {
 			System.out.println("Caught: " + e.getMessage());
 		}
 		System.out.println();
+	}
+
+	private static void demonstrateThreads() {
+		System.out.println("-- Threads: race condition --");
+
+		UnsafeBalance unsafe = new UnsafeBalance();
+		Thread[] racers = new Thread[10];
+
+		for (int i = 0; i < racers.length; i++) {
+			racers[i] = new Thread(() -> {
+				for (int j = 0; j < 1000; j++) {
+					unsafe.addOne();
+					Thread.yield();
+				}
+			}, "unsafe-" + i);
+		}
+
+		startAndJoin(racers);
+		System.out.println("Unsynchronized balance: " +
+		    unsafe.get() + " (expected 10000)");
+		System.out.println();
+
+		System.out.println("-- Threads: synchronized deposit --");
+
+		Account account = new SavingsAccount("Thread Test", 0, 0);
+		Thread[] workers = new Thread[10];
+
+		for (int i = 0; i < workers.length; i++) {
+			workers[i] = new Thread(
+			    new AccountWorker(account, 1000, 1),
+			    "worker-" + i);
+		}
+
+		for (Thread worker : workers) {
+			System.out.println(worker.getName() +
+			    " before start: " + worker.getState());
+			worker.start();
+			System.out.println(worker.getName() +
+			    " after start: " + worker.getState());
+		}
+
+		for (Thread worker : workers) {
+			try {
+				worker.join();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				System.out.println("Interrupted while joining " +
+				    worker.getName());
+			}
+		}
+
+		for (Thread worker : workers) {
+			System.out.println(worker.getName() +
+			    " after join: " + worker.getState());
+		}
+
+		System.out.println("Synchronized balance: " +
+		    account.getBalance() + " (expected 10000)");
+		System.out.println();
+	}
+
+	private static void startAndJoin(Thread[] threads) {
+		for (Thread thread : threads) {
+			thread.start();
+		}
+
+		for (Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				System.out.println("Interrupted while joining " +
+				    thread.getName());
+			}
+		}
+	}
+
+	private static class UnsafeBalance {
+
+		private long balance;
+
+		void addOne() {
+			balance += 1;
+		}
+
+		long get() {
+			return balance;
+		}
 	}
 
 	private static void printHeader() {

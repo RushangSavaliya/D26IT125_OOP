@@ -1,15 +1,13 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 8** stage (Milestone 1): a checked exception
-hierarchy replaces the old `false` return on failure, so every rejection
-carries a reason and, for withdrawals, the shortfall. The Practical 1
-menu shell is unchanged and every menu option is still a placeholder for
-a later lab.
+This is the **Practical 9** stage: `deposit` and `withdraw` are
+`synchronized`, so many threads can update one account without losing
+updates. The demo first shows the unsynchronized race, then the correct
+balance. The Practical 1 menu shell is unchanged.
 
-On start-up the program runs a short demo (model behaviour, interfaces,
-annotation validation, input validation, command parsing, statements,
-custom exceptions, `finally` and try-with-resources) and then shows the
+On start-up the program runs a short demo (model, interfaces, validation,
+annotations, exceptions, threads and statements) and then shows the
 menu.
 
 ## Requirements
@@ -45,7 +43,7 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 | `model.annotation` | `Id`, `Positive`, `MaxLength` (all `@Target(FIELD)`, `@Retention(RUNTIME)`) |
 | `exception` | `BankException` (checked base), `InsufficientFundsException`, `AccountNotFoundException`, `InvalidAmountException` |
 | `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter`, `AuditTrail` |
-| `service` | `MiniBank` (`main`) |
+| `service` | `MiniBank` (`main`), `AccountWorker` (Runnable depositing into one account) |
 
 ## Key types
 
@@ -64,6 +62,9 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 - `Account.transfer` — `try`/`catch`/`finally`, re-throwing a `BankException`.
 - `AuditTrail` — small `AutoCloseable` used to demonstrate
   try-with-resources.
+- `AccountWorker` — `Runnable` that deposits `times` × `amount`; ten
+  threads on one `Account` end at exactly 10000 because `deposit` and
+  `withdraw` are `synchronized`.
 
 ## Menu
 
