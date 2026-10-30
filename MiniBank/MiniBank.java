@@ -9,7 +9,8 @@ public class MiniBank {
 	public static void main(String[] args) {
 
 		printHeader();
-		demonstrateAccounts();
+		Account[] accounts = demonstrateAccounts();
+		demonstrateValidationLayer(accounts[0]);
 
 		try (Scanner sc = new Scanner(System.in)) {
 
@@ -60,7 +61,7 @@ public class MiniBank {
 		    "Thank you for banking with MiniBank. Goodbye!");
 	}
 
-	private static void demonstrateAccounts() {
+	private static Account[] demonstrateAccounts() {
 		System.out.println("-- Customers --");
 		Customer first = new Customer("Riya", "riya@example.com",
 		    "9876543210",
@@ -123,6 +124,51 @@ public class MiniBank {
 		Object candidate = accounts[1];
 		System.out.println("candidate instanceof Account: " +
 		    (candidate instanceof Account));
+		System.out.println();
+
+		return accounts;
+	}
+
+	private static void demonstrateValidationLayer(Account account) {
+		System.out.println("-- Validator --");
+
+		System.out.println("Mobile 9876543210 -> " +
+		    Validator.isValidMobile("9876543210"));
+		System.out.println("Mobile 12345 -> " +
+		    Validator.isValidMobile("12345"));
+
+		System.out.println("Email riya@example.com -> " +
+		    Validator.isValidEmail("riya@example.com"));
+		System.out.println("Email riya@example -> " +
+		    Validator.isValidEmail("riya@example"));
+
+		System.out.println("PAN ABCDE1234F -> " +
+		    Validator.isValidPan("ABCDE1234F"));
+		System.out.println("PAN ABCD1234F -> " +
+		    Validator.isValidPan("ABCD1234F"));
+
+		System.out.println("IFSC HDFC0001234 -> " +
+		    Validator.isValidIfsc("HDFC0001234"));
+		System.out.println("IFSC HDFC1001234 -> " +
+		    Validator.isValidIfsc("HDFC1001234"));
+		System.out.println();
+
+		System.out.println("-- Command parsing --");
+		Command command =
+		    CommandParser.parse("DEPOSIT AC0001 500");
+		System.out.println("type=" + command.type() +
+		    ", accountNumber=" + command.accountNumber() +
+		    ", amount=" + command.amount());
+
+		try {
+			CommandParser.parse("DEPOSIT AC0001");
+		} catch (IllegalArgumentException e) {
+			System.out.println("Rejected line: " + e.getMessage());
+		}
+		System.out.println();
+
+		System.out.println("-- Statement --");
+		System.out.println(StatementFormatter.buildStatement(account));
 		System.out.println();
 	}
 

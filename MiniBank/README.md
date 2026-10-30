@@ -1,14 +1,14 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 3** stage: the `Customer` and `Account` model
-classes now print readably, compare by account number, and expose a
-nested `Address`; the Practical 1 menu shell is unchanged and every menu
-option is still a placeholder for a later lab.
+This is the **Practical 4** stage: the model classes plus the input
+validation and command-parsing layer (`Validator`, `CommandParser`,
+`StatementFormatter`). The Practical 1 menu shell is unchanged and every
+menu option is still a placeholder for a later lab.
 
-On start-up the program runs a short demo (customer ids, an address and a
-clone, deposits, withdrawals, `toString`/`equals`/`hashCode` and an
-`instanceof` check) and then shows the menu.
+On start-up the program runs a short demo (model behaviour, regex
+validators, command parsing and a formatted statement) and then shows the
+menu.
 
 ## Requirements
 
@@ -37,6 +37,11 @@ Type a menu number and press Enter. Enter `5` (Exit) to stop.
 | `MenuOption.java` | enum of the actions MiniBank offers |
 | `Customer.java` | customer details, nested `Address`, `clone()` |
 | `Account.java` | encapsulated account with `toString`, `equals` and `hashCode` by account number |
+| `Validator.java` | regex checks for mobile, email, PAN and IFSC |
+| `TransactionType.java` | enum of `DEPOSIT`, `WITHDRAW`, `TRANSFER` |
+| `Command.java` | record: type, account number, amount |
+| `CommandParser.java` | parses `DEPOSIT AC0001 500` into a `Command` |
+| `StatementFormatter.java` | multi-line statement built with `StringBuilder` |
 
 The classes are in the default package for now; Practical 6 moves them
 into the `model`, `util` and `service` packages.
