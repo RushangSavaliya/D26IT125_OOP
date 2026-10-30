@@ -2,6 +2,10 @@ package service;
 
 import java.util.Scanner;
 
+import exception.AccountNotFoundException;
+import exception.BankException;
+import exception.InsufficientFundsException;
+import exception.InvalidAmountException;
 import model.Account;
 import model.BankInfo;
 import model.Command;
@@ -13,6 +17,7 @@ import model.Premium;
 import model.SavingsAccount;
 import model.WithdrawRule;
 import util.AnnotationValidator;
+import util.AuditTrail;
 import util.CommandParser;
 import util.StatementFormatter;
 
@@ -27,11 +32,23 @@ public class MiniBank {
 	public static void main(String[] args) {
 
 		printHeader();
-		Account[] accounts = demonstrateAccounts();
-		demonstrateInterfaces(accounts);
-		demonstrateAnnotations(accounts);
-		demonstrateValidationLayer(accounts[0]);
 
+		try {
+			Account[] accounts = demonstrateAccounts();
+			demonstrateInterfaces(accounts);
+			demonstrateAnnotations(accounts);
+			demonstrateValidationLayer(accounts[0]);
+			demonstrateExceptions(accounts);
+		} catch (BankException e) {
+			System.out.println("Bank error: " + e.getMessage());
+		} finally {
+			System.out.println("Demo complete; menu starting.\n");
+		}
+
+		runMenu();
+	}
+
+	private static void runMenu() {
 		try (Scanner sc = new Scanner(System.in)) {
 
 			boolean running = true;
@@ -81,7 +98,7 @@ public class MiniBank {
 		    "Thank you for banking with MiniBank. Goodbye!");
 	}
 
-	private static Account[] demonstrateAccounts() {
+	private static Account[] demonstrateAccounts() throws BankException {
 		System.out.println("-- Customers --");
 		Customer first = new Customer("Riya", "riya@example.com",
 		    "9876543210",
@@ -112,13 +129,21 @@ public class MiniBank {
 		System.out.println(
 		    "Deposit 2000 -> balance " + riya.getBalance());
 
-		boolean paid = riya.withdraw(3000);
-		System.out.println("Withdraw 3000 -> " + paid +
-		    ", balance " + riya.getBalance());
+		try {
+			boolean paid = riya.withdraw(3000);
+			System.out.println("Withdraw 3000 -> " + paid +
+			    ", balance " + riya.getBalance());
+		} catch (BankException e) {
+			System.out.println("Withdraw 3000 failed: " +
+			    e.getMessage());
+		}
 
-		boolean rejected = riya.withdraw(10000);
-		System.out.println("Withdraw 10000 -> " + rejected +
-		    ", balance " + riya.getBalance());
+		try {
+			riya.withdraw(10000);
+		} catch (InsufficientFundsException e) {
+			System.out.println("Withdraw 10000 failed: short by " +
+			    e.getShortfall());
+		}
 
 		accounts[1].deposit(1500);
 		accounts[2].deposit(500);
@@ -282,6 +307,57 @@ public class MiniBank {
 
 		System.out.println("-- Statement --");
 		System.out.println(StatementFormatter.buildStatement(account));
+		System.out.println();
+	}
+
+	private static void demonstrateExceptions(Account[] accounts) {
+		System.out.println("-- Exceptions --");
+
+		Account low = new SavingsAccount("Test", 1000, 0);
+
+		try {
+			low.withdraw(5000);
+		} catch (InsufficientFundsException e) {
+			System.out.println("Withdrawal failed: short by " +
+			    e.getShortfall());
+		} catch (InvalidAmountException e) {
+			System.out.println("Withdrawal rejected: " +
+			    e.getMessage());
+		}
+
+		try {
+			low.deposit(-500);
+		} catch (InvalidAmountException e) {
+			System.out.println("Deposit rejected: " +
+			    e.getMessage());
+		}
+
+		try {
+			low.transfer(accounts[2], 500);
+			System.out.println("Transfer ok: " +
+			    low.getBalance() + " / " +
+			    accounts[2].getBalance());
+		} catch (BankException e) {
+			System.out.println("Transfer failed: " +
+			    e.getMessage());
+		}
+
+		try {
+			throw new AccountNotFoundException("AC9999");
+		} catch (AccountNotFoundException e) {
+			System.out.println("Lookup failed: " +
+			    e.getMessage());
+		}
+		System.out.println();
+
+		System.out.println("-- try-with-resources --");
+		try (AuditTrail audit = new AuditTrail("milestone-1")) {
+			audit.record("balance " + low.getBalance());
+			throw new BankException(
+			    "demo failure inside try-with-resources");
+		} catch (BankException e) {
+			System.out.println("Caught: " + e.getMessage());
+		}
 		System.out.println();
 	}
 

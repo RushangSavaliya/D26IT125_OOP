@@ -1,14 +1,16 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 7** stage: custom annotations (`@Id`,
-`@Positive`, `@MaxLength`) read at run time by a reflective validator.
-The Practical 1 menu shell is unchanged and every menu option is still a
-placeholder for a later lab.
+This is the **Practical 8** stage (Milestone 1): a checked exception
+hierarchy replaces the old `false` return on failure, so every rejection
+carries a reason and, for withdrawals, the shortfall. The Practical 1
+menu shell is unchanged and every menu option is still a placeholder for
+a later lab.
 
-On start-up the program runs a short demo (model behaviour, interface
-implementations, annotation validation, validators, command parsing and a
-formatted statement) and then shows the menu.
+On start-up the program runs a short demo (model behaviour, interfaces,
+annotation validation, input validation, command parsing, statements,
+custom exceptions, `finally` and try-with-resources) and then shows the
+menu.
 
 ## Requirements
 
@@ -17,7 +19,7 @@ formatted statement) and then shows the menu.
 ## Compile
 
 ```sh
-javac -d build $(find model util service -name '*.java')
+javac -d build $(find exception model util service -name '*.java')
 ```
 
 ## Run
@@ -41,7 +43,8 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 | --- | --- |
 | `model` | `BankInfo`, `MenuOption`, `Customer`, `Account`, `SavingsAccount`, `CurrentAccount`, `FixedDepositAccount`, `TransactionType`, `Command`, `Transactable`, `InterestBearing`, `WithdrawRule`, `Premium` |
 | `model.annotation` | `Id`, `Positive`, `MaxLength` (all `@Target(FIELD)`, `@Retention(RUNTIME)`) |
-| `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter` |
+| `exception` | `BankException` (checked base), `InsufficientFundsException`, `AccountNotFoundException`, `InvalidAmountException` |
+| `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter`, `AuditTrail` |
 | `service` | `MiniBank` (`main`) |
 
 ## Key types
@@ -56,6 +59,11 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
   repository in Practical 13.
 - `AnnotationValidator` — reads `@Positive` and `@MaxLength` by reflection
   (walking the superclass chain) and returns the error messages.
+- `deposit` / `withdraw` — now `throws InvalidAmountException`, and
+  `withdraw` also `throws InsufficientFundsException` (with `shortfall`).
+- `Account.transfer` — `try`/`catch`/`finally`, re-throwing a `BankException`.
+- `AuditTrail` — small `AutoCloseable` used to demonstrate
+  try-with-resources.
 
 ## Menu
 
