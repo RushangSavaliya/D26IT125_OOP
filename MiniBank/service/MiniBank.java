@@ -51,6 +51,7 @@ public class MiniBank {
 			ConcurrencyDemo.run();
 			demonstratePersistence(accounts);
 			demonstrateCollections();
+			demonstrateRepository();
 		} catch (BankException e) {
 			System.out.println("Bank error: " + e.getMessage());
 		} finally {
@@ -552,6 +553,58 @@ public class MiniBank {
 		for (String line : store.getHistory()) {
 			System.out.println("  " + line);
 		}
+		System.out.println();
+	}
+
+	private static void demonstrateRepository() {
+		System.out.println("-- Repository<Account> --");
+
+		Repository<Account> repository = new Repository<>();
+
+		Account first = new SavingsAccount("Isha", 7000, 500);
+		Account second = new CurrentAccount("Rahul", 3000, 1000);
+		Account third = new FixedDepositAccount("Tara", 12000);
+
+		repository.save(first);
+		repository.save(second);
+		repository.save(third);
+
+		System.out.println("findById(" +
+		    second.getAccountNumber() + "): " +
+		    repository.findById(second.getAccountNumber()));
+
+		System.out.println("findAll:");
+		for (Account account : repository.findAll()) {
+			System.out.println("  " + account);
+		}
+
+		System.out.println("average balance: " +
+		    Repository.average(new Long[] {
+			first.getBalance(), second.getBalance(),
+			third.getBalance()
+		    }));
+
+		Account fourth = new SavingsAccount("Veer", 4500, 500);
+		Account fifth = new SavingsAccount("Zara", 2500, 500);
+		repository.saveAll(fourth, fifth);
+
+		System.out.println("after saveAll: " +
+		    repository.findAll().size() + " accounts");
+
+		boolean deleted =
+		    repository.delete(first.getAccountNumber());
+		System.out.println("delete(" + first.getAccountNumber() +
+		    "): " + deleted + ", remaining " +
+		    repository.findAll().size());
+
+		Repository<Customer> customers = new Repository<>();
+		Customer customer = new Customer(
+		    "Riya", "riya@example.com", "9876543210");
+		customers.save(customer);
+
+		System.out.println("Repository<Customer> findById(" +
+		    customer.getCustomerId() + "): " +
+		    customers.findById(customer.getCustomerId()).getName());
 		System.out.println();
 	}
 

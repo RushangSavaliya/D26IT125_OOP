@@ -1,14 +1,13 @@
 # MiniBank
 
 Console banking application built across the OOP lab course (CEUE203).
-This is the **Practical 12** stage (Milestone 2): accounts are stored in a
-`HashMap` keyed by account number, sorted with a `Comparator`, and the
-transaction processor shares accounts through a `ConcurrentHashMap`. The
-Practical 1 menu shell is unchanged.
+This is the **Practical 13** stage: one generic `Repository<T>` stores any
+entity type, using the `@Id` field found by reflection as the map key.
+The Practical 1 menu shell is unchanged.
 
 On start-up the program runs a short demo (model, interfaces, validation,
-annotations, exceptions, threads, concurrency, persistence, reporting and
-collections) and then shows the menu.
+annotations, exceptions, threads, concurrency, persistence, reporting,
+collections and the generic repository) and then shows the menu.
 
 ## Requirements
 
@@ -43,7 +42,7 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 | `model.annotation` | `Id`, `Positive`, `MaxLength` (all `@Target(FIELD)`, `@Retention(RUNTIME)`) |
 | `exception` | `BankException` (checked base), `InsufficientFundsException`, `AccountNotFoundException`, `InvalidAmountException` |
 | `util` | `Validator`, `AnnotationValidator`, `CommandParser`, `StatementFormatter`, `AuditTrail`, `StatePersister`, `TransactionLog`, `ReportGenerator` |
-| `service` | `MiniBank` (`main`), `AccountWorker`, `TransactionProcessor`, `TransactionTask`, `TransactionBuffer`, `ConcurrencyDemo`, `AccountStore` |
+| `service` | `MiniBank` (`main`), `AccountWorker`, `TransactionProcessor`, `TransactionTask`, `TransactionBuffer`, `ConcurrencyDemo`, `AccountStore`, `Repository` |
 
 ## Key types
 
@@ -82,6 +81,10 @@ The manifest inside the JAR contains `Main-Class: service.MiniBank`.
 - `Account` implements `Comparable<Account>` (by account number).
 - `TransactionProcessor` keeps its shared accounts in a `ConcurrentHashMap`
   and can submit tasks by account number.
+- `Repository<T>` — generic `HashMap<String, T>` CRUD (`save`, `findById`,
+  `findAll`, `delete`), `@SafeVarargs saveAll`, bounded
+  `static <N extends Number> double average(N[])`, and a reflective `@Id`
+  lookup that walks the superclass chain.
 
 ## Menu
 
