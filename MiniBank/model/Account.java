@@ -1,4 +1,7 @@
-public abstract class Account implements Cloneable {
+package model;
+
+public abstract class Account implements Transactable, InterestBearing,
+    Cloneable {
 
 	private static long accountCounter = 0;
 

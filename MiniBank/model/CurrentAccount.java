@@ -1,4 +1,6 @@
-public class CurrentAccount extends Account {
+package model;
+
+public class CurrentAccount extends Account implements Premium {
 
 	private long overdraftLimit;
 

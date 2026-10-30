@@ -1,4 +1,21 @@
+package service;
+
 import java.util.Scanner;
+
+import model.Account;
+import model.BankInfo;
+import model.Command;
+import model.CurrentAccount;
+import model.Customer;
+import model.FixedDepositAccount;
+import model.MenuOption;
+import model.Premium;
+import model.SavingsAccount;
+import model.WithdrawRule;
+import util.CommandParser;
+import util.StatementFormatter;
+
+import static util.Validator.*;
 
 public class MiniBank {
 
@@ -10,6 +27,7 @@ public class MiniBank {
 
 		printHeader();
 		Account[] accounts = demonstrateAccounts();
+		demonstrateInterfaces(accounts);
 		demonstrateValidationLayer(accounts[0]);
 
 		try (Scanner sc = new Scanner(System.in)) {
@@ -153,28 +171,66 @@ public class MiniBank {
 		return accounts;
 	}
 
+	private static void demonstrateInterfaces(Account[] accounts) {
+		System.out.println("-- WithdrawRule: anonymous vs lambda --");
+
+		WithdrawRule anonymousRule = new WithdrawRule() {
+			public boolean allow(Account account, long amount) {
+				return account.canWithdraw(amount);
+			}
+		};
+
+		WithdrawRule lambdaRule =
+		    (account, amount) -> account.canWithdraw(amount);
+
+		for (Account account : accounts) {
+			System.out.println(account.getAccountNumber() +
+			    " allow(500): anonymous=" +
+			    anonymousRule.allow(account, 500) +
+			    ", lambda=" +
+			    lambdaRule.allow(account, 500));
+		}
+		System.out.println();
+
+		System.out.println("-- yearlyInterest() default method --");
+		for (Account account : accounts) {
+			System.out.println(account.getAccountNumber() +
+			    " yearly interest " + account.yearlyInterest());
+		}
+		System.out.println();
+
+		System.out.println("-- Premium marker --");
+		for (Account account : accounts) {
+			if (account instanceof Premium) {
+				System.out.println(
+				    account.getAccountNumber() + " is premium");
+			}
+		}
+		System.out.println();
+	}
+
 	private static void demonstrateValidationLayer(Account account) {
 		System.out.println("-- Validator --");
 
 		System.out.println("Mobile 9876543210 -> " +
-		    Validator.isValidMobile("9876543210"));
+		    isValidMobile("9876543210"));
 		System.out.println("Mobile 12345 -> " +
-		    Validator.isValidMobile("12345"));
+		    isValidMobile("12345"));
 
 		System.out.println("Email riya@example.com -> " +
-		    Validator.isValidEmail("riya@example.com"));
+		    isValidEmail("riya@example.com"));
 		System.out.println("Email riya@example -> " +
-		    Validator.isValidEmail("riya@example"));
+		    isValidEmail("riya@example"));
 
 		System.out.println("PAN ABCDE1234F -> " +
-		    Validator.isValidPan("ABCDE1234F"));
+		    isValidPan("ABCDE1234F"));
 		System.out.println("PAN ABCD1234F -> " +
-		    Validator.isValidPan("ABCD1234F"));
+		    isValidPan("ABCD1234F"));
 
 		System.out.println("IFSC HDFC0001234 -> " +
-		    Validator.isValidIfsc("HDFC0001234"));
+		    isValidIfsc("HDFC0001234"));
 		System.out.println("IFSC HDFC1001234 -> " +
-		    Validator.isValidIfsc("HDFC1001234"));
+		    isValidIfsc("HDFC1001234"));
 		System.out.println();
 
 		System.out.println("-- Command parsing --");
