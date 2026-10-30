@@ -81,9 +81,9 @@ public class MiniBank {
 
 		System.out.println("-- Account demo --");
 		Account[] accounts = {
-			new Account("Riya", 5000),
-			new Account("Aarav"),
-			new Account("Meera", 2500)
+			new SavingsAccount("Riya", 5000, 1000),
+			new CurrentAccount("Aarav", 0, 2000),
+			new FixedDepositAccount("Meera", 2500)
 		};
 
 		Account riya = accounts[0];
@@ -104,7 +104,7 @@ public class MiniBank {
 		accounts[2].deposit(500);
 
 		Account a1 = accounts[0];
-		Account a2 = new Account(a1);
+		Account a2 = a1.clone();
 
 		System.out.println("-- Accounts (toString) --");
 		for (Account account : accounts) {
@@ -124,6 +124,30 @@ public class MiniBank {
 		Object candidate = accounts[1];
 		System.out.println("candidate instanceof Account: " +
 		    (candidate instanceof Account));
+		System.out.println();
+
+		System.out.println("-- Polymorphism --");
+		for (Account account : accounts) {
+			System.out.println(account.getClass().getSimpleName() +
+			    " " + account.getAccountNumber() + " rate " +
+			    account.interestRate() + "%");
+		}
+
+		System.out.println("Savings can withdraw 3500? " +
+		    accounts[0].canWithdraw(3500));
+		System.out.println("Current can withdraw 3000? " +
+		    accounts[1].canWithdraw(3000));
+		System.out.println("Fixed deposit can withdraw 100? " +
+		    accounts[2].canWithdraw(100));
+
+		for (Account account : accounts) {
+			if (account instanceof CurrentAccount current) {
+				System.out.println(
+				    current.getAccountNumber() +
+				    " overdraft limit " +
+				    current.getOverdraftLimit());
+			}
+		}
 		System.out.println();
 
 		return accounts;

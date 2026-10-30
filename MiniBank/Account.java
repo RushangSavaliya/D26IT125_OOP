@@ -1,4 +1,4 @@
-public class Account {
+public abstract class Account implements Cloneable {
 
 	private static long accountCounter = 0;
 
@@ -18,31 +18,34 @@ public class Account {
 		this(ownerName, 0);
 	}
 
-	// Copy constructor: same account number, used to build an equal twin
-	// of an account so the equals() contract can be demonstrated.
-	public Account(Account other) {
-		this.accountNumber = other.accountNumber;
-		this.ownerName = other.ownerName;
-		this.balance = other.balance;
-		this.active = other.active;
-	}
-
 	private static String generateAccountNumber() {
 		accountCounter++;
 		return String.format("AC%04d", accountCounter);
 	}
+
+	public abstract double interestRate();
+
+	public abstract boolean canWithdraw(long amount);
 
 	public void deposit(long amount) {
 		balance += amount;
 	}
 
 	public boolean withdraw(long amount) {
-		if (amount > balance) {
+		if (!canWithdraw(amount)) {
 			return false;
 		}
 
 		balance -= amount;
 		return true;
+	}
+
+	public Account clone() {
+		try {
+			return (Account) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError("Account is Cloneable", e);
+		}
 	}
 
 	public String getAccountNumber() {
