@@ -1,16 +1,18 @@
 package model;
 
-import java.io.Serializable;
-
-public class SavingsAccount extends Account implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class SavingsAccount extends Account {
 
 	private long minBalance;
 
 	public SavingsAccount(String ownerName, long openingBalance,
 	    long minBalance) {
 		super(ownerName, openingBalance);
+		this.minBalance = minBalance;
+	}
+
+	public SavingsAccount(String accountNumber, String ownerName,
+	    long balance, long minBalance) {
+		super(accountNumber, ownerName, balance);
 		this.minBalance = minBalance;
 	}
 

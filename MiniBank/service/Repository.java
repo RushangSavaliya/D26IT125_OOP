@@ -24,31 +24,6 @@ public class Repository<T> {
 		return new ArrayList<>(store.values());
 	}
 
-	public boolean delete(String id) {
-		return store.remove(id) != null;
-	}
-
-	@SafeVarargs
-	public final void saveAll(T... items) {
-		for (T item : items) {
-			save(item);
-		}
-	}
-
-	public static <N extends Number> double average(N[] values) {
-		if (values == null || values.length == 0) {
-			return 0.0;
-		}
-
-		double total = 0;
-
-		for (N value : values) {
-			total += value.doubleValue();
-		}
-
-		return total / values.length;
-	}
-
 	private String extractId(T entity) {
 		if (entity == null) {
 			throw new IllegalArgumentException(

@@ -1,4 +1,7 @@
 *.class
 *.jar
+!minibank.jar
 build/
+build-test/
+lib/
 data/

@@ -22,14 +22,6 @@ public class TransactionProcessor {
 		accounts.put(account.getAccountNumber(), account);
 	}
 
-	public Account find(String accountNumber) {
-		return accounts.get(accountNumber);
-	}
-
-	public void submit(Runnable task) {
-		pool.execute(task);
-	}
-
 	public void submit(String accountNumber, TransactionType type,
 	    long amount) {
 		pool.execute(() -> {

@@ -1,24 +1,17 @@
 package model;
 
-import java.io.Serializable;
-
-import exception.BankException;
 import exception.InsufficientFundsException;
 import exception.InvalidAmountException;
 import model.annotation.Id;
-import model.annotation.Positive;
 
 public abstract class Account implements Transactable, InterestBearing,
-    Cloneable, Serializable, Comparable<Account> {
-
-	private static final long serialVersionUID = 1L;
+    Comparable<Account> {
 
 	private static long accountCounter = 0;
 
 	@Id
 	private final String accountNumber;
 	private String ownerName;
-	@Positive
 	private long balance;
 	private boolean active;
 
@@ -29,13 +22,34 @@ public abstract class Account implements Transactable, InterestBearing,
 		this.active = true;
 	}
 
-	public Account(String ownerName) {
-		this(ownerName, 0);
+	protected Account(String accountNumber, String ownerName,
+	    long balance) {
+		this.accountNumber = accountNumber;
+		this.ownerName = ownerName;
+		this.balance = balance;
+		this.active = true;
 	}
 
 	private static String generateAccountNumber() {
 		accountCounter++;
 		return String.format("AC%04d", accountCounter);
+	}
+
+	public static synchronized void syncCounter(Account[] accounts) {
+		if (accounts == null) {
+			return;
+		}
+
+		for (Account account : accounts) {
+			String digits = account.accountNumber.substring(2);
+
+			try {
+				long value = Long.parseLong(digits);
+				accountCounter = Math.max(accountCounter, value);
+			} catch (NumberFormatException e) {
+				// Ignore ids that are not in the ACdddd format.
+			}
+		}
 	}
 
 	@Override
@@ -67,34 +81,6 @@ public abstract class Account implements Transactable, InterestBearing,
 
 		balance -= amount;
 		return true;
-	}
-
-	public void transfer(Account to, long amount) throws BankException {
-		if (to == null) {
-			throw new BankException("Target account is required");
-		}
-
-		try {
-			withdraw(amount);
-			to.deposit(amount);
-		} catch (BankException e) {
-			throw new BankException("Transfer " + accountNumber +
-			    " -> " + to.getAccountNumber() + " failed: " +
-			    e.getMessage(), e);
-		} finally {
-			System.out.println("Transfer attempt: " + accountNumber +
-			    " -> " + to.getAccountNumber() + ", amount " +
-			    amount);
-		}
-	}
-
-	@Override
-	public Account clone() {
-		try {
-			return (Account) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new AssertionError("Account is Cloneable", e);
-		}
 	}
 
 	public String getAccountNumber() {

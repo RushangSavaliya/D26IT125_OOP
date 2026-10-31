@@ -1,17 +1,18 @@
 package model;
 
-import java.io.Serializable;
-
-public class CurrentAccount extends Account
-    implements Premium, Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class CurrentAccount extends Account {
 
 	private long overdraftLimit;
 
 	public CurrentAccount(String ownerName, long openingBalance,
 	    long overdraftLimit) {
 		super(ownerName, openingBalance);
+		this.overdraftLimit = overdraftLimit;
+	}
+
+	public CurrentAccount(String accountNumber, String ownerName,
+	    long balance, long overdraftLimit) {
+		super(accountNumber, ownerName, balance);
 		this.overdraftLimit = overdraftLimit;
 	}
 

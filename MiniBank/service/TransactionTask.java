@@ -23,8 +23,6 @@ public class TransactionTask implements Runnable {
 			switch (type) {
 				case DEPOSIT -> account.deposit(amount);
 				case WITHDRAW -> account.withdraw(amount);
-				default -> throw new BankException(
-				    "Unsupported batch type: " + type);
 			}
 
 			System.out.println(Thread.currentThread().getName() +
